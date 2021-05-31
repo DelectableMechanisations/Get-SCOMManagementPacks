@@ -591,7 +591,10 @@ foreach ($MP in $MPList)
                         $MPFilename = $DLDetails.FileName
                         if ($MPFilename -like "*.msi")
                         {
-	                        &cmd /c "msiexec /a `"$MPPath\$MPName\$MPVer\$MPFilename`" /quiet TARGETDIR=`"$MPPath\$MPName\$MPVer\Extracted\`""
+                            $msiExecPath      = "$env:windir\System32\msiexec.exe"
+                            $msiExecArguments = " /a `"$MPPath\$MPName\$MPVer\$MPFilename`" /quiet TARGETDIR=`"$MPPath\$MPName\$MPVer\Extracted\`""
+                            Start-Process -FilePath $msiExecPath -ArgumentList $msiExecArguments -Wait -NoNewWindow
+                            Start-Sleep -Seconds 5
 
                             # The extraction will leave a duplicate .msi file in the Extracted folder. Remove it to reduce file space and duplicate files
                             Get-ChildItem -Path "$MPPath\$MPName\$MPVer\Extracted\" -Filter "*.msi" | Remove-Item | Out-Null
@@ -661,5 +664,5 @@ else
     "Success,$CurrentDate,ScriptStatus,Process complete; total time was $($TimeSpan)" | Out-File -FilePath $MPLogFilePath -Append
 }
 
-Write-Output -Message "[$(Get-Date)] Script Complete! Process ran for $($TimeSpan)."
+Write-Verbose -Message "[$(Get-Date)] Script Complete! Process ran for $($TimeSpan)."
 #endregion
